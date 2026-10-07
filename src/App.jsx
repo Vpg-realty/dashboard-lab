@@ -11,6 +11,7 @@ import RevenueView from './views/RevenueView.jsx';
 import MasterView from './views/MasterView.jsx';
 import AdvancedView from './views/AdvancedView.jsx';
 import PipelineView from './views/PipelineView.jsx';
+import LeaderboardView from './views/LeaderboardView.jsx';
 import { CYCLE_VIEWS, CYCLE_INTERVAL_MS, STORAGE_PREFIX } from './data/config.js';
 import { useDataUpdates, useDataStatus } from './data/source.js';
 
@@ -18,6 +19,7 @@ const VIEWS = {
   conversations: { label: 'Conversations · live',           component: ConversationsView },
   agents:        { label: 'Agents · pipeline growth',       component: AgentsView },
   opportunities: { label: 'Opportunities · KPI tracking',   component: OpportunitiesView },
+  leaderboard:   { label: 'Leaderboard · weekly score',     component: LeaderboardView },
   revenue:       { label: 'Revenue · this month',           component: RevenueView },
   master:        { label: 'Master · all metrics',           component: MasterView },
   pipeline:      { label: 'Pipeline · active deals',        component: PipelineView },

@@ -4,6 +4,7 @@ const LABELS = {
   conversations: 'Conversations',
   agents: 'Agents',
   opportunities: 'Opportunities',
+  leaderboard: 'Leaderboard',
   revenue: 'Revenue',
   master: 'Master',
   pipeline: 'Pipeline',

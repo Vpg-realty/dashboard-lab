@@ -81,7 +81,7 @@ export const PIPELINE_STAGES = [
 // Pipeline added Sept 29 (Luke). Revenue taken out of the rotation Oct 7
 // (Luke: simplify what the TV cycles through; Master already carries the
 // revenue goal bar) — it's still a tab, just before Advanced (NAV_VIEWS).
-export const CYCLE_VIEWS = ['conversations', 'agents', 'opportunities', 'master', 'pipeline'];
+export const CYCLE_VIEWS = ['conversations', 'agents', 'opportunities', 'leaderboard', 'master', 'pipeline'];
 // Tab order in the nav bar: the rotation first, then the click-only tabs.
 export const NAV_VIEWS = [...CYCLE_VIEWS, 'revenue', 'advanced'];
 export const CYCLE_INTERVAL_MS = 10000;
