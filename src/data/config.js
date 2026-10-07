@@ -83,7 +83,7 @@ export const PIPELINE_STAGES = [
 // revenue goal bar) — it's still a tab, just before Advanced (NAV_VIEWS).
 export const CYCLE_VIEWS = ['conversations', 'agents', 'opportunities', 'leaderboard', 'master', 'pipeline'];
 // Tab order in the nav bar: the rotation first, then the click-only tabs.
-export const NAV_VIEWS = [...CYCLE_VIEWS, 'revenue', 'advanced'];
+export const NAV_VIEWS = [...CYCLE_VIEWS, 'revenue', 'deals', 'advanced'];
 export const CYCLE_INTERVAL_MS = 10000;
 
 // Date-range presets for the Advanced view.

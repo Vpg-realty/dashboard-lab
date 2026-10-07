@@ -12,6 +12,7 @@ import MasterView from './views/MasterView.jsx';
 import AdvancedView from './views/AdvancedView.jsx';
 import PipelineView from './views/PipelineView.jsx';
 import LeaderboardView from './views/LeaderboardView.jsx';
+import PipelineCalendarView from './views/PipelineCalendarView.jsx';
 import { CYCLE_VIEWS, CYCLE_INTERVAL_MS, STORAGE_PREFIX } from './data/config.js';
 import { useDataUpdates, useDataStatus } from './data/source.js';
 
@@ -22,7 +23,8 @@ const VIEWS = {
   leaderboard:   { label: 'Leaderboard · weekly score',     component: LeaderboardView },
   revenue:       { label: 'Revenue · this month',           component: RevenueView },
   master:        { label: 'Master · all metrics',           component: MasterView },
-  pipeline:      { label: 'Pipeline · active deals',        component: PipelineView },
+  pipeline:      { label: 'Pipeline · next 7 days',         component: PipelineCalendarView },
+  deals:         { label: 'Deal board · every active deal', component: PipelineView },
   advanced:      { label: 'Advanced · per-subaccount drill-down', component: AdvancedView },
 };
 
