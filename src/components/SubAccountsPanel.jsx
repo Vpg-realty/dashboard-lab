@@ -30,6 +30,8 @@ export default function SubAccountsPanel({ open, onClose, dataStatus, snapshotEr
   const [patPresent, setPatPresent] = useState(hasPAT());
 
   useEffect(() => {
+    // Resetting the panel on close / re-reading the PAT on open is the intent.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!open) { setMode('view'); setStatus(null); return; }
     setPatPresent(hasPAT());
     const onEsc = (e) => e.key === 'Escape' && onClose();
@@ -254,7 +256,7 @@ function ViewMode({ snapshotErrors, onAddClick, onManageRepsClick, patPresent, b
 // Inline row that expands under a sub-account when you click Edit. Real
 // operations only — reassign hits the reassignSubAccount GitHub-write path,
 // delete removes both the subaccounts.json row AND the PIT secret.
-function EditSubRow({ sub, currentRep, busy, setBusy, setStatus, patPresent, onNeedsPAT, onDone }) {
+function EditSubRow({ sub, busy, setBusy, setStatus, patPresent, onNeedsPAT, onDone }) {
   const [selectedRepId, setSelectedRepId] = useState(sub.repId);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const dirty = selectedRepId !== sub.repId;
@@ -408,6 +410,8 @@ function AddMode({ busy, setBusy, setStatus, setMode, patPresent, onNeedsPAT }) 
   // because its first two letters ("MI") collide with Michigan.
   useEffect(() => {
     if (marketMode === 'new' && newMarketName && !newMarketCode) {
+      // One-shot suggestion while the code field is empty; the user can edit it.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewMarketCode(suggestMarketCode(newMarketName, MARKETS.map((m) => m.id)));
     }
   }, [newMarketName, marketMode, newMarketCode]);

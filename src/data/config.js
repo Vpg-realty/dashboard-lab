@@ -99,6 +99,10 @@ export const DATE_RANGES = [
 // Lab build (VITE_LAB=1): test copy at /dashboard-lab/. Hides the Refresh and
 // Sub-Accounts buttons and shows a LAB badge.
 export const IS_LAB = import.meta.env.VITE_LAB === '1';
+// Lab and live share the vpg-realty.github.io origin, so they share
+// localStorage. The lab uses its own key prefix so it never reads or
+// overwrites anything the live dashboard keeps in the browser.
+export const STORAGE_PREFIX = IS_LAB ? 'vpg-lab.' : 'vpg.';
 
 // Repo coordinates used by the Sub-Accounts panel for GitHub API writes.
 // This is the lab repo, so no code path can ever write to the live dashboard.

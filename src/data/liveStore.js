@@ -15,7 +15,7 @@
 //   - Wake Lock to keep the screen alive on supported browsers.
 
 import { useEffect, useReducer } from 'react';
-import { REPS, MARKETS, TIERS, IS_LAB } from './config.js';
+import { REPS, MARKETS, TIERS, IS_LAB, STORAGE_PREFIX } from './config.js';
 
 // File is rebuilt upstream every ~2 min; 30s on the client picks up new data fast.
 const POLL_MS = Number(import.meta.env.VITE_POLL_MS || 30_000);
@@ -26,8 +26,8 @@ const BASE = import.meta.env.BASE_URL || '/';
 const DATA_BASE = import.meta.env.VITE_DATA_BASE || BASE;
 const DATA_URL = `${DATA_BASE}data.json`;
 const HISTORY_URL = `${DATA_BASE}history.json`;
-const LS_KEY = 'vpg.snapshot.v1';
-const HISTORY_LS_KEY = 'vpg.history.v1';
+const LS_KEY = `${STORAGE_PREFIX}snapshot.v1`;
+const HISTORY_LS_KEY = `${STORAGE_PREFIX}history.v1`;
 const STALE_RELOAD_MS = 30 * 60 * 1000;  // 30 min of failures → reload page
 
 // Build placeholder pairs so the dashboard renders zeros (not crashes) before
@@ -106,13 +106,15 @@ async function fetchHistory() {
     if (Array.isArray(d?.entries)) {
       HISTORY = d.entries;
       // Offline fallback only — cache the most recent 120 days so a year of
-      // history can't blow the ~5 MB localStorage quota.
-      try { localStorage.setItem(HISTORY_LS_KEY, JSON.stringify(HISTORY.slice(-120))); } catch { /* quota / private mode — ignore */ }
+      // history can't blow the ~5 MB localStorage quota. The lab skips the
+      // cache so it never uses up storage the live board shares.
+      if (!IS_LAB) try { localStorage.setItem(HISTORY_LS_KEY, JSON.stringify(HISTORY.slice(-120))); } catch { /* quota / private mode — ignore */ }
     }
   } catch { /* fall back to whatever's in localStorage */ }
 }
 
 function saveToStorage(snapshot) {
+  if (IS_LAB) return;
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(snapshot));
   } catch { /* quota / private mode — ignore */ }

@@ -3,7 +3,7 @@ import Panel from '../components/Panel.jsx';
 import RepStackBars from '../components/RepStackBars.jsx';
 import { REPS, MARKETS, TIERS } from '../data/config.js';
 import { STATE_DOT } from '../utils/marketShade.js';
-import { getPair, tierTotals, headline, historyDeltaTierSum, historyDeltaTierSumTotal, historyDaysBack } from '../data/source.js';
+import { getPair, tierTotals, headline, historyDeltaTierSum } from '../data/source.js';
 import { formatNumber } from '../utils/format.js';
 
 // Luke (May 11): Active Agent Count (renamed from Total Agents, Oct 7) =

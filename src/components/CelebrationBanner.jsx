@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { REPS, MARKETS } from '../data/config.js';
+import { REPS, MARKETS, STORAGE_PREFIX } from '../data/config.js';
 import { PAIRS } from '../data/source.js';
 import { formatCompactCurrency } from '../utils/format.js';
 import { shortDate } from '../utils/historyRange.js';
@@ -15,7 +15,7 @@ import { shortDate } from '../utils/historyRange.js';
 // Several at once queue and show one after another.
 const FRESH_MS = 45 * 60 * 1000;
 const SHOW_MS = 40 * 1000;
-const STORE = 'vpg.celebrated';
+const STORE = `${STORAGE_PREFIX}celebrated`;
 
 const loadSeen = () => {
   try { return new Set(JSON.parse(localStorage.getItem(STORE) || '[]')); } catch { return new Set(); }

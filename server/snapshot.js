@@ -44,12 +44,6 @@ const startOfWeekMs = () => {
   d.setDate(d.getDate() - (day - 1));
   return d.getTime();
 };
-const startOfMonthMs = () => {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(1);
-  return d.getTime();
-};
 
 export async function buildSnapshot({ tokens }) {
   const errors = [];

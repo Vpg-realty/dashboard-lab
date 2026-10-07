@@ -226,7 +226,7 @@ function DataBadge({ status, now }) {
     );
   }
   const ageMs = status.lastSync ? now - new Date(status.lastSync) : null;
-  let tone = 'emerald', label = 'Live';
+  let tone = 'emerald', label;
   if (status.placeholder || !status.lastSync) {
     tone = 'zinc'; label = 'Connecting…';
   } else if (status.error) {

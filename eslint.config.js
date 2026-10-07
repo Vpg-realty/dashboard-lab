@@ -17,5 +17,14 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // `const { secret, ...rest } = obj` is how fields get stripped.
+      'no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    },
+  },
+  {
+    // Build-time code runs in Node, not the browser.
+    files: ['vite.config.js', 'server/**/*.{js,mjs}', 'scripts/**/*.{js,mjs}'],
+    languageOptions: { globals: globals.node },
   },
 ])

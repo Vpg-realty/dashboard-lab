@@ -11,7 +11,7 @@ import RevenueView from './views/RevenueView.jsx';
 import MasterView from './views/MasterView.jsx';
 import AdvancedView from './views/AdvancedView.jsx';
 import PipelineView from './views/PipelineView.jsx';
-import { CYCLE_VIEWS, CYCLE_INTERVAL_MS } from './data/config.js';
+import { CYCLE_VIEWS, CYCLE_INTERVAL_MS, STORAGE_PREFIX } from './data/config.js';
 import { useDataUpdates, useDataStatus } from './data/source.js';
 
 const VIEWS = {
@@ -36,10 +36,10 @@ export default function App() {
   // Per-user cycle speed, persisted in localStorage. Range: 5–60s.
   const [cycleIntervalMs, setCycleIntervalMs] = useState(() => {
     try {
-      const raw = localStorage.getItem('vpg.cycleIntervalMs');
+      const raw = localStorage.getItem(`${STORAGE_PREFIX}cycleIntervalMs`);
       const v = raw ? Number(raw) : NaN;
       if (Number.isFinite(v) && v >= 5000 && v <= 60000) return v;
-    } catch {}
+    } catch { /* storage unavailable */ }
     return CYCLE_INTERVAL_MS;
   });
   const indexRef = useRef(0);
@@ -47,7 +47,7 @@ export default function App() {
   const handleCycleIntervalChange = useCallback((ms) => {
     const clamped = Math.min(60000, Math.max(5000, Math.round(ms / 1000) * 1000));
     setCycleIntervalMs(clamped);
-    try { localStorage.setItem('vpg.cycleIntervalMs', String(clamped)); } catch {}
+    try { localStorage.setItem(`${STORAGE_PREFIX}cycleIntervalMs`, String(clamped)); } catch { /* storage unavailable */ }
   }, []);
 
   // Cycle through views every N seconds (paused on advanced/master)

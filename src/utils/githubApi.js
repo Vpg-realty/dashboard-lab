@@ -15,17 +15,17 @@
 // encryption that GitHub requires for secret values.
 
 import sodium from 'libsodium-wrappers';
-import { REPO_OWNER, REPO_NAME } from '../data/config.js';
+import { REPO_OWNER, REPO_NAME, STORAGE_PREFIX } from '../data/config.js';
 import { pitSecretName } from './base32.js';
 
-const PAT_KEY = 'vpg.gh_pat.v1';
+const PAT_KEY = `${STORAGE_PREFIX}gh_pat.v1`;
 const SUBS_PATH = 'subaccounts.json';
 
 export function getStoredPAT() {
   try { return localStorage.getItem(PAT_KEY) || ''; } catch { return ''; }
 }
 export function setStoredPAT(pat) {
-  try { pat ? localStorage.setItem(PAT_KEY, pat) : localStorage.removeItem(PAT_KEY); } catch {}
+  try { pat ? localStorage.setItem(PAT_KEY, pat) : localStorage.removeItem(PAT_KEY); } catch { /* storage unavailable */ }
 }
 export function hasPAT() { return !!getStoredPAT(); }
 
@@ -177,7 +177,6 @@ export async function reassignSubAccount(locationId, newRepId) {
     const sa = (cfg.subaccounts || []).find((s) => s.locationId === locationId);
     if (!sa) throw new Error(`Sub-account not found: ${locationId}`);
     if (!(cfg.reps || []).find((r) => r.id === newRepId)) throw new Error(`Rep not found: ${newRepId}`);
-    const oldRepId = sa.repId;
     sa.repId = newRepId;
     return cfg;
   }, `Reassign ${locationId} → ${newRepId}`);

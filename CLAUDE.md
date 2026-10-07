@@ -33,9 +33,11 @@ here; port the ones Luke likes to the live repo by PR.
 - Keep the deploy cadence low (push + daily). The lab shares the
   vpg-realty.github.io Pages host with live.
 - The lab and live share an origin (vpg-realty.github.io), so they share
-  localStorage (`vpg.*` keys: cached snapshot, celebrated deals, cycle
-  speed, PAT). Don't open the lab on the office TV's browser, and don't
-  change the shape of what those keys store without renaming them in the lab.
+  localStorage. The lab only uses `vpg-lab.*` keys (`STORAGE_PREFIX` in
+  `config.js`) and never caches the snapshot/history there, so it can't
+  touch live's `vpg.*` keys (cached snapshot, celebrated deals, cycle speed,
+  PAT) or eat into the shared quota. Every new localStorage key must use
+  `STORAGE_PREFIX`.
 - `server/`, `scripts/` and `subaccounts.json` are copies kept so the code
   matches live; the lab workflow doesn't run them (except that
   `subaccounts.json` is overwritten with the live one at build time).
@@ -44,8 +46,17 @@ here; port the ones Luke likes to the live repo by PR.
 
 ## Syncing from live
 
-Copy live `main` over this repo, then re-apply the lab edits:
-`VITE_DATA_BASE` in `liveStore.js`, `IS_LAB` + `REPO_NAME` in `config.js`,
-the `IS_LAB` checks in `Header.jsx`, this CLAUDE.md, `README.md`, and the
-lab `deploy.yml` (delete `pinger.yml`, `scorecard.yml`).
-Run `npm run build` before pushing.
+Lab `main` has live `main` in its history, so a sync is a merge:
+
+```
+git fetch https://github.com/vpg-realty/dashboard.git main:live-main
+git merge live-main
+```
+
+Keep the lab side of any conflict in the lab-only edits: `VITE_DATA_BASE`
+in `liveStore.js`, `IS_LAB` / `STORAGE_PREFIX` / `REPO_NAME` in
+`config.js` and the files that use them, the `IS_LAB` checks in
+`Header.jsx`, this CLAUDE.md, `README.md`, the lab `deploy.yml`, and no
+`pinger.yml` / `scorecard.yml`. Then `npm run lint && npm run build` before
+pushing. Data is always live regardless; syncing only matters before
+building or porting an experiment.
