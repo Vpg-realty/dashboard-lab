@@ -1,0 +1,314 @@
+{
+  "_comment": "Single source of truth for reps × markets × sub-accounts. Both src/data/config.js (browser) and server/config.js (build-time) derive from this file. The 'Sub-Accounts' panel in the dashboard edits this file via the GitHub API when authorized.",
+  "markets": [
+    {
+      "id": "AZ",
+      "name": "Arizona",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "NC",
+      "name": "North Carolina",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "GA",
+      "name": "Georgia",
+      "color": "#10b981"
+    },
+    {
+      "id": "TX",
+      "name": "Texas",
+      "color": "#a855f7"
+    },
+    {
+      "id": "FL",
+      "name": "Florida",
+      "color": "#ec4899"
+    },
+    {
+      "id": "OH",
+      "name": "Ohio",
+      "color": "#ef4444"
+    },
+    {
+      "id": "MI",
+      "name": "Michigan",
+      "color": "#06b6d4"
+    },
+    {
+      "id": "MO",
+      "name": "Missouri",
+      "color": "#84cc16"
+    },
+    {
+      "id": "OK",
+      "name": "Oklahoma",
+      "color": "#14b8a6"
+    },
+    {
+      "id": "IN",
+      "name": "Indiana",
+      "color": "#22c55e"
+    },
+    {
+      "id": "WA",
+      "name": "Washington",
+      "color": "#facc15"
+    },
+    {
+      "id": "NV",
+      "name": "Nevada",
+      "color": "#f43f5e"
+    },
+    {
+      "id": "TN",
+      "name": "Tennessee",
+      "color": "#d946ef"
+    },
+    {
+      "id": "AL",
+      "name": "Alabama",
+      "color": "#eab308"
+    },
+    {
+      "id": "SC",
+      "name": "South Carolina",
+      "color": "#0284c7"
+    },
+    {
+      "id": "CO",
+      "name": "Colorado",
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "NM",
+      "name": "New Mexico",
+      "color": "#f97316"
+    },
+    {
+      "id": "AR",
+      "name": "Arkansas",
+      "color": "#a16207"
+    },
+    {
+      "id": "CA",
+      "name": "California",
+      "color": "#6366f1"
+    }
+  ],
+  "reps": [
+    {
+      "id": "anthony",
+      "name": "Anthony Sheffield",
+      "color": "#2a78d6"
+    },
+    {
+      "id": "patrick",
+      "name": "Patrick Jeffries",
+      "color": "#eb6834"
+    },
+    {
+      "id": "daniel",
+      "name": "Daniel Diaz",
+      "color": "#1baf7a"
+    },
+    {
+      "id": "axel",
+      "name": "Axel Contreras",
+      "color": "#eda100"
+    },
+    {
+      "id": "prince_pharrams",
+      "name": "Rory Wick",
+      "color": "#e87ba4"
+    },
+    {
+      "id": "sam_mackenzie",
+      "name": "Sam MacKenzie",
+      "color": "#008300"
+    },
+    {
+      "id": "spencer_brown",
+      "name": "Spencer Brown",
+      "color": "#4a3aa7"
+    },
+    {
+      "id": "cayden_sicz",
+      "name": "Cayden Sicz",
+      "color": "#e34948"
+    },
+    {
+      "id": "danni_brown",
+      "name": "Danni Brown",
+      "color": "#0f8fa8"
+    }
+  ],
+  "subaccounts": [
+    {
+      "repId": "danni_brown",
+      "marketId": "AZ",
+      "locationId": "IjTrTBLsiRDWZAvPPgFd"
+    },
+    {
+      "repId": "daniel",
+      "marketId": "NC",
+      "locationId": "ZNHJiLMXDDtxCvOX1oxT"
+    },
+    {
+      "repId": "anthony",
+      "marketId": "AZ",
+      "locationId": "O1lZGP1vlqfU0GzbCPTO"
+    },
+    {
+      "repId": "anthony",
+      "marketId": "OH",
+      "locationId": "9qFG0hfeVy6kaSL28RMd"
+    },
+    {
+      "repId": "anthony",
+      "marketId": "NC",
+      "locationId": "HcRtBNpPRDI4nHPpO9zb"
+    },
+    {
+      "repId": "patrick",
+      "marketId": "AZ",
+      "locationId": "kUB590U9xsaXCtInnuvF"
+    },
+    {
+      "repId": "patrick",
+      "marketId": "GA",
+      "locationId": "y6AYkI53ArJpgyrqKqA1"
+    },
+    {
+      "repId": "patrick",
+      "marketId": "NC",
+      "locationId": "rrN44jJQPaDQ8rfhFMed"
+    },
+    {
+      "repId": "daniel",
+      "marketId": "AZ",
+      "locationId": "fzh8Ebl8UytO3UEtR24p"
+    },
+    {
+      "repId": "daniel",
+      "marketId": "TX",
+      "locationId": "4O98H14LqmZr5Lk30E7A"
+    },
+    {
+      "repId": "axel",
+      "marketId": "AZ",
+      "locationId": "xtyFkqv9DKxqhb8Iolmg"
+    },
+    {
+      "repId": "axel",
+      "marketId": "FL",
+      "locationId": "jgK6encOpnzh9SI4mt90"
+    },
+    {
+      "repId": "daniel",
+      "marketId": "MO",
+      "locationId": "tGVFu5aufwgiPES8HXWJ"
+    },
+    {
+      "repId": "cayden_sicz",
+      "marketId": "OK",
+      "locationId": "XgFQlD2DBRbnWauS1vKU"
+    },
+    {
+      "repId": "sam_mackenzie",
+      "marketId": "IN",
+      "locationId": "kGZiF8SAySmt2m2ivS9l"
+    },
+    {
+      "repId": "sam_mackenzie",
+      "marketId": "WA",
+      "locationId": "IsyF2EIor923Wseyl1HR"
+    },
+    {
+      "repId": "sam_mackenzie",
+      "marketId": "FL",
+      "locationId": "WKLKPVLGQWgcOMyomr4D"
+    },
+    {
+      "repId": "prince_pharrams",
+      "marketId": "GA",
+      "locationId": "idJ47DtuZfpBqtGBPm5N"
+    },
+    {
+      "repId": "prince_pharrams",
+      "marketId": "OH",
+      "locationId": "ptDByNv214O44ruVdf7j"
+    },
+    {
+      "repId": "spencer_brown",
+      "marketId": "TN",
+      "locationId": "4UtYECpuatg8Q1XMfGqk"
+    },
+    {
+      "repId": "spencer_brown",
+      "marketId": "OK",
+      "locationId": "ldSK1aIEg1q5i9stwql7"
+    },
+    {
+      "repId": "sam_mackenzie",
+      "marketId": "TN",
+      "locationId": "LptMkyGQ5oJrf1ZgdWwV"
+    },
+    {
+      "repId": "axel",
+      "marketId": "AL",
+      "locationId": "DJsGOJ1suKUquAPItAZI"
+    },
+    {
+      "repId": "axel",
+      "marketId": "SC",
+      "locationId": "gcOJSqctUP0iwdah2PAG"
+    },
+    {
+      "repId": "danni_brown",
+      "marketId": "NC",
+      "locationId": "Zp1sS78xJyfAKUjVBqXo"
+    },
+    {
+      "repId": "cayden_sicz",
+      "marketId": "WA",
+      "locationId": "waFG3uRq89mQUmvMgutD"
+    },
+    {
+      "repId": "spencer_brown",
+      "marketId": "GA",
+      "locationId": "ktWTvd7wDM7tdg4hru3O"
+    },
+    {
+      "repId": "danni_brown",
+      "marketId": "AL",
+      "locationId": "K6Ll2Kcs2sWCSLfC1ZFk"
+    },
+    {
+      "repId": "anthony",
+      "marketId": "CO",
+      "locationId": "8jwEShfAHZ8hibiC4n4W"
+    },
+    {
+      "repId": "cayden_sicz",
+      "marketId": "NM",
+      "locationId": "abO0HHCW5CCpvXwIphoN"
+    },
+    {
+      "repId": "danni_brown",
+      "marketId": "AR",
+      "locationId": "JMQ7ZJ5ssCXyPejM4Jza"
+    },
+    {
+      "repId": "spencer_brown",
+      "marketId": "CA",
+      "locationId": "eEX8JLPz2SRzGXWuRWm7"
+    },
+    {
+      "repId": "prince_pharrams",
+      "marketId": "CO",
+      "locationId": "D66W4ghjCS4bkJ6aus6f"
+    }
+  ]
+}
