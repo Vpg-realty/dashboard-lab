@@ -13,8 +13,13 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 // each { inbound, outbound, connected, talkSec }. Only calls through GHL's
 // phone system. Pairs without it (older data / pull failed) count as 0 and
 // are reported in the panel footer.
-const CALL_IN = '#0f766e';   // inbound
-const CALL_OUT = '#6366f1';  // outbound
+// Softer pastel-leaning tones (Luke, Oct 8) that still carry bold white
+// numbers inside the bars.
+const CALL_IN = '#4fa3a5';   // inbound: soft teal
+const CALL_OUT = '#8b8fe6';  // outbound: soft periwinkle
+// A segment narrower than this share of the widest bar has no room for its
+// number inside; it shows just after the bar instead.
+const INSIDE_MIN = 0.05;
 const emptyCalls = () => ({ inbound: 0, outbound: 0, connected: 0, talkSec: 0 });
 function addCalls(a, b) {
   if (!b) return a;
@@ -167,9 +172,21 @@ export default function ConversationsView() {
                   <span className="text-[min(1rem,1.8vh)] leading-tight font-semibold truncate">{rep.name.split(' ')[0]}</span>
                 </span>
                 <div className="min-w-0">
-                  <div className="flex h-[min(1.1rem,2vh)] rounded bg-zinc-100 overflow-hidden">
-                    <div style={{ width: `${(week.inbound / maxRepCalls) * 100}%`, background: CALL_IN }} />
-                    <div style={{ width: `${(week.outbound / maxRepCalls) * 100}%`, background: CALL_OUT }} />
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex flex-1 h-[min(1.6rem,2.6vh)] rounded-md bg-zinc-100 overflow-hidden text-white font-bold text-[min(0.85rem,1.6vh)] tabular-nums [text-shadow:0_1px_1px_rgba(0,0,0,0.25)]">
+                      {[['inbound', CALL_IN], ['outbound', CALL_OUT]].map(([k, color]) => (
+                        week[k] > 0 && (
+                          <div key={k} className="flex items-center justify-center overflow-hidden" style={{ width: `${(week[k] / maxRepCalls) * 100}%`, background: color }}>
+                            {week[k] / maxRepCalls >= INSIDE_MIN ? week[k] : ''}
+                          </div>
+                        )
+                      ))}
+                    </div>
+                    {[['inbound', CALL_IN], ['outbound', CALL_OUT]].map(([k, color]) => (
+                      week[k] > 0 && week[k] / maxRepCalls < INSIDE_MIN && (
+                        <span key={k} className="shrink-0 font-bold tabular-nums text-[min(0.85rem,1.6vh)]" style={{ color }}>{week[k]}</span>
+                      )
+                    ))}
                   </div>
                   {/* Detail line only where there's height for it (TV 1080p); shorter windows keep bar + total. */}
                   <div className="hidden [@media(min-height:960px)]:block text-[min(0.72rem,1.3vh)] text-zinc-500 tabular-nums truncate mt-0.5">
