@@ -1,13 +1,30 @@
 import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, LabelList, ReferenceLine } from 'recharts';
 import Panel from '../components/Panel.jsx';
 import { REPS, MARKETS } from '../data/config.js';
-import { getPair, totalConversationsByMarket, headline, historyEntries } from '../data/source.js';
+import { PAIRS, getPair, totalConversationsByMarket, headline, historyEntries } from '../data/source.js';
 import { laToday, weekStart, addDays, daysInclusive, teamConvosByDay } from '../utils/historyRange.js';
 import { formatNumber, niceMax } from '../utils/format.js';
 import { STATE_DOT, segmentFill } from '../utils/marketShade.js';
 import { segmentLabel } from '../components/SegmentLabel.jsx';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+// Calls (Luke, Oct 8): pair.calls = { today, week } from server/calls.js,
+// each { inbound, outbound, connected, talkSec }. Only calls through GHL's
+// phone system. Pairs without it (older data / pull failed) count as 0 and
+// are reported in the panel footer.
+const CALL_IN = '#0f766e';   // inbound
+const CALL_OUT = '#6366f1';  // outbound
+const emptyCalls = () => ({ inbound: 0, outbound: 0, connected: 0, talkSec: 0 });
+function addCalls(a, b) {
+  if (!b) return a;
+  return { inbound: a.inbound + b.inbound, outbound: a.outbound + b.outbound, connected: a.connected + b.connected, talkSec: a.talkSec + b.talkSec };
+}
+const callTotal = (c) => c.inbound + c.outbound;
+function talkTime(sec) {
+  const m = Math.round(sec / 60);
+  return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`;
+}
 
 // Week-over-week badge in the trend panel header (Luke, Oct 7: the grey
 // subtitle was too easy to miss). Green ▲ when completed days are at or
@@ -28,16 +45,29 @@ function WowBadge({ now, last, pct, range }) {
 
 export default function ConversationsView() {
   const head = headline();
+  const callsToday = PAIRS.reduce((a, p) => addCalls(a, p.calls?.today), emptyCalls());
+  const callsWeek = PAIRS.reduce((a, p) => addCalls(a, p.calls?.week), emptyCalls());
+  const callsMissing = PAIRS.filter((p) => !p._placeholder && !p._unconfigured && !p.calls).length;
+  const callsByRep = REPS.map((rep) => ({
+    rep,
+    week: rep.markets.reduce((a, m) => addCalls(a, getPair(rep.id, m)?.calls?.week), emptyCalls()),
+    today: rep.markets.reduce((a, m) => addCalls(a, getPair(rep.id, m)?.calls?.today), emptyCalls()),
+  })).sort((a, b) => callTotal(b.week) - callTotal(a.week) || b.week.connected - a.week.connected);
+  const maxRepCalls = Math.max(1, ...callsByRep.map((r) => callTotal(r.week)));
   // State cards ordered by today's outreach, busiest first (Luke, Oct 7), so
   // the order shifts as the day goes on. Ties: this week, then name.
   const byMarket = [...totalConversationsByMarket()].sort(
     (a, b) => b.today - a.today || b.week - a.week || a.name.localeCompare(b.name),
   );
 
+  // Narrow windows (< 1600px, e.g. 1440×810) share the row with the calls
+  // panel, so the chart's rep names are cut to 4 letters there.
+  const narrow = typeof window !== 'undefined' && window.innerWidth < 1600;
   // Per-rep × market — rep on the X axis, stacked by market.
   // _total drives the LabelList on top of each stacked bar (Luke, May 4).
   const byRep = REPS.map((rep) => {
-    const row = { rep: rep.name.split(' ')[0], _total: 0, _cap: 1e-6 };
+    const name = rep.name.split(' ')[0];
+    const row = { rep: narrow ? name.slice(0, 4) : name, _total: 0, _cap: 1e-6 };
     rep.markets.forEach((m) => {
       const p = getPair(rep.id, m);
       const v = p?.convosWeek ?? 0;
@@ -72,13 +102,15 @@ export default function ConversationsView() {
 
   return (
     <div className="grid grid-cols-12 grid-rows-[auto_minmax(0,1fr)_auto] gap-4 h-full min-h-0">
-      <div className="col-span-12 grid grid-cols-3 gap-4">
+      <div className="col-span-12 grid grid-cols-2 xl:grid-cols-4 gap-4">
         <BigStat label="Conversations Today" value={head.conversationsToday} accent="emerald" />
-        <BigStat label="This Week" value={head.conversationsWeek} accent="blue" />
-        <BigStat label="Avg / Day" value={Math.round(head.conversationsWeek / 7)} accent="violet" />
+        <BigStat label="Conversations This Week" value={head.conversationsWeek} accent="blue"
+          sub={`avg ${formatNumber(Math.round(head.conversationsWeek / 7))} / day`} />
+        <CallStat label="Calls Today" c={callsToday} />
+        <CallStat label="Calls This Week" c={callsWeek} />
       </div>
 
-      <Panel className="col-span-12 lg:col-span-7 min-h-0" title="By Rep × Market" subtitle="this week" accent="Conversations">
+      <Panel className="col-span-12 lg:col-span-4 min-h-0" title="By Rep × Market" subtitle="this week" accent="Conversations">
         <div className="h-full flex flex-col gap-2 min-h-0">
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
@@ -117,7 +149,45 @@ export default function ConversationsView() {
       </Panel>
 
       <Panel
-        className="col-span-12 lg:col-span-5 min-h-0"
+        className="col-span-12 lg:col-span-4 min-h-0"
+        title="By Rep"
+        subtitle={<span className="inline-flex items-center gap-3">
+          <span className="inline-flex items-center gap-1"><span className="w-3 h-3 rounded-sm" style={{ background: CALL_IN }} />in</span>
+          <span className="inline-flex items-center gap-1"><span className="w-3 h-3 rounded-sm" style={{ background: CALL_OUT }} />out</span>
+          <span>this week</span>
+        </span>}
+        accent="Calls"
+      >
+        <div className="h-full flex flex-col min-h-0">
+          <div className="flex-1 min-h-0 flex flex-col justify-around overflow-hidden">
+            {callsByRep.map(({ rep, week, today: t }) => (
+              <div key={rep.id} className="grid grid-cols-[5.5rem_minmax(0,1fr)_3rem] items-center gap-2">
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: rep.color }} />
+                  <span className="text-[min(1rem,1.8vh)] leading-tight font-semibold truncate">{rep.name.split(' ')[0]}</span>
+                </span>
+                <div className="min-w-0">
+                  <div className="flex h-[min(1.1rem,2vh)] rounded bg-zinc-100 overflow-hidden">
+                    <div style={{ width: `${(week.inbound / maxRepCalls) * 100}%`, background: CALL_IN }} />
+                    <div style={{ width: `${(week.outbound / maxRepCalls) * 100}%`, background: CALL_OUT }} />
+                  </div>
+                  {/* Detail line only where there's height for it (TV 1080p); shorter windows keep bar + total. */}
+                  <div className="hidden [@media(min-height:960px)]:block text-[min(0.72rem,1.3vh)] text-zinc-500 tabular-nums truncate mt-0.5">
+                    {week.inbound} in · {week.outbound} out · {week.connected} connected · {talkTime(week.talkSec)} talk{t.inbound + t.outbound ? ` · ${callTotal(t)} today` : ''}
+                  </div>
+                </div>
+                <span className="text-right text-[min(1.25rem,2.2vh)] leading-tight font-extrabold tabular-nums">{callTotal(week)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="hidden [@media(min-height:960px)]:block text-center text-[11px] text-zinc-500 shrink-0 pt-1">
+            Calls through GHL&apos;s phone system · connected = answered{callsMissing > 0 ? ` · no call data for ${callsMissing} sub-account${callsMissing === 1 ? '' : 's'}` : ''}
+          </div>
+        </div>
+      </Panel>
+
+      <Panel
+        className="col-span-12 lg:col-span-4 min-h-0"
         title="This Week vs Last Week"
         subtitle={todayIdx > 0 && wow != null
           ? <WowBadge now={doneNow} last={doneLast} pct={wow} range={todayIdx > 1 ? `${DAYS[0]}–${DAYS[todayIdx - 1]}` : DAYS[0]} />
@@ -177,7 +247,23 @@ export default function ConversationsView() {
   );
 }
 
-function BigStat({ label, value, accent }) {
+function CallStat({ label, c }) {
+  const total = callTotal(c);
+  return (
+    <div className="rounded-xl border p-5 min-w-0 text-zinc-900 border-zinc-300/80 bg-white">
+      <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-600 mb-2 truncate">{label}</div>
+      <div className="flex items-baseline gap-3 min-w-0">
+        <div className="text-3xl xl:text-4xl 2xl:text-5xl font-bold tabular-nums">{formatNumber(total)}</div>
+        <div className="text-sm font-semibold tabular-nums leading-tight min-w-0">
+          <div className="truncate"><span style={{ color: CALL_IN }}>↓ {formatNumber(c.inbound)} in</span> · <span style={{ color: CALL_OUT }}>↑ {formatNumber(c.outbound)} out</span></div>
+          <div className="text-zinc-500 truncate">{formatNumber(c.connected)} connected{total ? ` (${Math.round((c.connected / total) * 100)}%)` : ''} · {talkTime(c.talkSec)} talk</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BigStat({ label, value, accent, sub }) {
   const colors = {
     emerald: 'text-emerald-600 border-emerald-500/30 bg-emerald-500/5',
     blue: 'text-blue-600 border-blue-500/30 bg-blue-500/5',
@@ -186,7 +272,10 @@ function BigStat({ label, value, accent }) {
   return (
     <div className={`rounded-xl border p-5 ${colors[accent]} min-w-0`}>
       <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-600 mb-2 truncate">{label}</div>
-      <div className="text-3xl xl:text-4xl 2xl:text-5xl font-bold tabular-nums truncate">{formatNumber(value)}</div>
+      <div className="flex items-baseline gap-3 min-w-0">
+        <div className="text-3xl xl:text-4xl 2xl:text-5xl font-bold tabular-nums truncate">{formatNumber(value)}</div>
+        {sub && <div className="text-sm font-semibold text-zinc-500 truncate">{sub}</div>}
+      </div>
     </div>
   );
 }
