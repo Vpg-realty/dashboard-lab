@@ -201,24 +201,31 @@ function Key({ className, label }) {
   );
 }
 
+// Scroll speed (Luke, Oct 8: slower, and glide back up instead of jumping
+// to the top): 1px per STEP_MS ≈ 12px/s, about one card every 6 s, with a
+// PAUSE_MS rest at each end before reversing.
+const STEP_MS = 80;
+const PAUSE_MS = 5000;
+
 // A column that's taller than the screen scrolls itself slowly so the office
-// TV shows every deal: glide down, pause at the bottom, jump back to the top.
+// TV shows every deal: glide down, pause, glide back up, pause, repeat.
 function AutoScroll({ className, children }) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
-    let pauseUntil = Date.now() + 3000;
+    let dir = 1;
+    let pauseUntil = Date.now() + PAUSE_MS;
     const timer = setInterval(() => {
       if (Date.now() < pauseUntil || el.scrollHeight <= el.clientHeight) return;
-      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
-        el.scrollTop = 0;
-        pauseUntil = Date.now() + 3000;
-      } else {
-        el.scrollTop += 1;
-        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) pauseUntil = Date.now() + 3000;
+      el.scrollTop += dir;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      const atTop = el.scrollTop <= 0;
+      if ((dir > 0 && atBottom) || (dir < 0 && atTop)) {
+        dir = -dir;
+        pauseUntil = Date.now() + PAUSE_MS;
       }
-    }, 40);
+    }, STEP_MS);
     return () => clearInterval(timer);
   }, []);
   return <div ref={ref} className={`flex-1 min-h-0 overflow-y-auto ${className}`}>{children}</div>;
