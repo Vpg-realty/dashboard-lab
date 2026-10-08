@@ -8,6 +8,7 @@ const LABELS = {
   revenue: 'Revenue',
   master: 'Master',
   pipeline: 'Pipeline',
+  tracker: 'Deal Tracker',
   advanced: 'Advanced',
 };
 

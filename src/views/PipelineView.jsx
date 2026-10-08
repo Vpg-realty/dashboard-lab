@@ -3,7 +3,8 @@ import { REPS, MARKETS } from '../data/config.js';
 import { PAIRS } from '../data/source.js';
 import { formatCurrency } from '../utils/format.js';
 import { STATE_DOT } from '../utils/marketShade.js';
-import { laToday, daysInclusive, shortDate } from '../utils/historyRange.js';
+import { deadlineTone, daysFrom } from '../utils/deals.js';
+import { laToday, shortDate } from '../utils/historyRange.js';
 
 // Pipeline tab (Luke, Sept 29): every deal currently in Under Contract, DISPO
 // Active or Assigned, plus deals that reached Closed this month. Cards show
@@ -19,21 +20,6 @@ const COLUMNS = [
 ];
 
 const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-// Deadline colours (Luke, Sept 29): 3 days out light blue, 2 days light
-// yellow, 1 day light red, day-of dark red. Further out stays plain; dates
-// already behind us are greyed.
-function deadlineTone(daysOut) {
-  if (daysOut == null) return { box: 'border-zinc-200 bg-white text-zinc-400', label: 'text-zinc-400', rel: null };
-  if (daysOut < 0) return { box: 'border-zinc-200 bg-zinc-50 text-zinc-400', label: 'text-zinc-400', rel: 'passed' };
-  if (daysOut === 0) return { box: 'border-red-800 bg-red-700 text-white', label: 'text-red-100', rel: 'TODAY' };
-  if (daysOut === 1) return { box: 'border-red-300 bg-red-100 text-red-800', label: 'text-red-600', rel: 'TOMORROW' };
-  if (daysOut === 2) return { box: 'border-yellow-300 bg-yellow-100 text-yellow-900', label: 'text-yellow-700', rel: '2 days' };
-  if (daysOut === 3) return { box: 'border-sky-300 bg-sky-100 text-sky-900', label: 'text-sky-700', rel: '3 days' };
-  return { box: 'border-zinc-200 bg-white text-zinc-800', label: 'text-zinc-500', rel: `${daysOut} days` };
-}
-
-const daysFrom = (today, date) => (date ? daysInclusive(today, date) - 1 : null);
 
 export default function PipelineView() {
   const today = laToday();
