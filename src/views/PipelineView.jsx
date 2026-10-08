@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { REPS, MARKETS } from '../data/config.js';
 import { PAIRS } from '../data/source.js';
 import { formatCurrency } from '../utils/format.js';
-import { laToday, daysInclusive, shortDate } from '../utils/historyRange.js';
+import { laToday, addDays, daysInclusive, shortDate } from '../utils/historyRange.js';
 
 // Pipeline tab (Luke, Sept 29): every deal currently in Under Contract, Dispo
 // Active or Assigned, plus deals that reached Closed this month. Cards show
@@ -16,6 +16,9 @@ import { laToday, daysInclusive, shortDate } from '../utils/historyRange.js';
 // LATE once it has passed; the other date stays grey. Late deals sort to the
 // top. Headers show count, $ (when there is any) and late / due-soon chips.
 // Closed is narrower but still lists the month's closings.
+// A "Due now" column on the far left (Luke, Oct 8) pulls out the deals whose
+// key date is today or tomorrow; they stay in their stage columns too. Late
+// deals are only a count at its foot (they're red at the top of each column).
 
 const COLUMNS = [
   { stage: 'under_contract', title: 'Under Contract', color: '#2563eb' },
@@ -71,7 +74,8 @@ export default function PipelineView() {
 
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_0.72fr] gap-3 flex-1 min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[0.9fr_1fr_1fr_1fr_0.72fr] gap-3 flex-1 min-h-0">
+        <DueNowColumn deals={deals} today={today} />
         {COLUMNS.map((col) => (
           <StageColumn
             key={col.stage}
@@ -109,10 +113,74 @@ function sortDeals(list, stage) {
   return [...list].sort((a, b) => key(a) - key(b) || b.value - a.value);
 }
 
+const STAGE_TITLE = Object.fromEntries(COLUMNS.map((c) => [c.stage, c.title]));
+const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function DueNowColumn({ deals, today }) {
+  const open = deals.filter((d) => d.stage !== 'closed');
+  const byValue = (a, b) => b.value - a.value;
+  const dueToday = open.filter((d) => d.keyDays === 0).sort(byValue);
+  const dueTomorrow = open.filter((d) => d.keyDays === 1).sort(byValue);
+  const late = open.filter((d) => d.late).length;
+  const tomorrow = addDays(today, 1);
+  const dayName = (s) => `${WEEKDAY[new Date(`${s}T12:00:00Z`).getUTCDay()]} ${shortDate(s)}`;
+  return (
+    <section className="rounded-xl border border-zinc-300 bg-white flex flex-col min-h-0 overflow-hidden">
+      <div className="px-4 pt-2.5 pb-2 border-b border-zinc-200 shrink-0" style={{ borderTop: '5px solid #dc2626' }}>
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="text-xl font-bold text-zinc-900 truncate">Due now</h3>
+          <span className="text-3xl font-extrabold tabular-nums leading-none text-red-600">{dueToday.length + dueTomorrow.length}</span>
+        </div>
+        <div className="mt-1 min-h-[1.5rem] text-sm text-zinc-500">IP ends &amp; closings, today and tomorrow</div>
+      </div>
+      <AutoScroll className="p-2 flex flex-col gap-1.5">
+        <DueHeading label={`Today · ${dayName(today)}`} count={dueToday.length} strong />
+        {dueToday.length === 0 && <div className="text-sm font-semibold text-emerald-700 px-1 pb-1">✓ Nothing due today</div>}
+        {dueToday.map((d) => <DueCard key={d.id} deal={d} />)}
+        <DueHeading label={`Tomorrow · ${dayName(tomorrow)}`} count={dueTomorrow.length} />
+        {dueTomorrow.length === 0 && <div className="text-sm text-zinc-400 px-1">Nothing due tomorrow</div>}
+        {dueTomorrow.map((d) => <DueCard key={d.id} deal={d} />)}
+      </AutoScroll>
+      {late > 0 && (
+        <div className="shrink-0 m-2 mt-0 rounded-lg bg-rose-600 text-white px-3 py-2">
+          <div className="text-base font-extrabold">{late} late</div>
+          <div className="text-xs opacity-90">IP end or COE passed · shown in red at the top of each column</div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function DueHeading({ label, count, strong }) {
+  return (
+    <div className={`flex justify-between items-baseline px-1 pt-1 text-xs font-extrabold uppercase tracking-wider ${strong ? 'text-red-700' : 'text-zinc-500'}`}>
+      <span>{label}</span>{count > 0 && <span className="tabular-nums">{count}</span>}
+    </div>
+  );
+}
+
+function DueCard({ deal }) {
+  const what = KEY_DATE[deal.stage] === 'coe' ? 'Closing' : 'IP ends';
+  const t = deadlineTone(deal.keyDays);
+  return (
+    <div className={`rounded-lg border px-3 py-2 shrink-0 ${t.box}`} style={{ borderLeft: `4px solid ${deal.rep?.color || '#a1a1aa'}` }}>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-[16px] font-bold leading-snug truncate">{deal.address || 'No address'}</span>
+        {deal.value > 0 && <span className="text-[15px] font-extrabold tabular-nums shrink-0">{formatCurrency(deal.value)}</span>}
+      </div>
+      <div className="flex items-center justify-between gap-2 mt-0.5 text-[13px]">
+        <span className="truncate opacity-90">{deal.rep?.name?.split(' ')[0] || '—'} · {STAGE_TITLE[deal.stage]}</span>
+        <span className="font-extrabold uppercase tracking-wider text-[11px] shrink-0">{what}</span>
+      </div>
+    </div>
+  );
+}
+
 function StageColumn({ col, deals, today }) {
   const total = deals.reduce((a, d) => a + d.value, 0);
   const closed = col.stage === 'closed';
-  const title = closed ? `Closed · ${MONTHS_LONG[+today.slice(5, 7) - 1]}` : col.title;
+  const month = MONTHS_LONG[+today.slice(5, 7) - 1];
+  const title = closed ? <>Closed · <span className="hidden 2xl:inline">{month}</span><span className="2xl:hidden">{month.slice(0, 3)}</span></> : col.title;
   const late = deals.filter((d) => d.late).length;
   const soon = deals.filter((d) => d.soon).length;
   return (
@@ -183,8 +251,9 @@ function DateChip({ label, date, daysOut, isKey }) {
       rel = t.rel;
     }
   }
+  // On narrower screens only the key date shows, so rep and state stay readable.
   return (
-    <span className={`rounded-md border px-1.5 py-0.5 text-[12px] leading-none whitespace-nowrap tabular-nums ${box}`}>
+    <span className={`rounded-md border px-1.5 py-0.5 text-[12px] leading-none whitespace-nowrap tabular-nums ${box} ${isKey ? '' : 'hidden 2xl:inline'}`}>
       <span className="font-semibold opacity-80">{label}</span>{' '}
       <span className="font-bold">{date ? shortDate(date) : '—'}</span>
       {rel && <span className="font-bold"> · {rel}</span>}
