@@ -28,7 +28,7 @@ export default function AlertStrip() {
 
   const items = [
     ipToday.length && { tone: 'red', text: `${ipToday.length} IP end${ipToday.length > 1 ? 's' : ''} today`, sub: list(ipToday) },
-    dispoRisk.length && { tone: 'red', text: `${dispoRisk.length} in DISPO, IP ends ≤ 2 days`, sub: list(dispoRisk) },
+    dispoRisk.length && { tone: 'red', text: `${dispoRisk.length} in Dispo, IP ends ≤ 2 days`, sub: list(dispoRisk) },
     ipTomorrow.length && { tone: 'amber', text: `${ipTomorrow.length} IP end${ipTomorrow.length > 1 ? 's' : ''} tomorrow` },
     coeSoon.length && { tone: 'amber', text: `${coeSoon.length} closing${coeSoon.length > 1 ? 's' : ''} today / tomorrow` },
     quiet.length && { tone: 'zinc', text: `No conversations yet today: ${quiet.map((r) => r.name.split(' ')[0]).join(', ')}` },

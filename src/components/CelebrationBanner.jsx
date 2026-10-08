@@ -80,9 +80,9 @@ export default function CelebrationBanner() {
           <div className="px-8 py-5 flex items-center gap-6 text-white">
             <div className="text-6xl">{closed ? '🎉' : '🚀'}</div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm uppercase tracking-[0.3em] font-bold opacity-90">{closed ? 'Closed' : 'New deal in DISPO'}</div>
+              <div className="text-sm uppercase tracking-[0.3em] font-bold opacity-90">{closed ? 'Closed' : 'New deal in Dispo'}</div>
               <div className="text-4xl font-extrabold leading-tight truncate">
-                {closed ? `${first} closed one!` : `${first} got one to DISPO!`}
+                {closed ? `${first} closed one!` : `${first} got one to Dispo!`}
               </div>
               <div className="text-lg font-semibold opacity-95 truncate">
                 {current.address || 'No address'}{market ? ` · ${market.name}` : ''}
