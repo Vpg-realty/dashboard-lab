@@ -5,7 +5,8 @@ import { getPair, getPairsForRep, headline } from '../data/source.js';
 import { marketShade } from '../utils/marketShade.js';
 
 // Layout: four columns, fits one TV viewport (Luke, Oct 7).
-//   1. Team KPIs (4 cards: opps opened, offers, contracts, closed)
+//   1. Team KPIs (4 cards: opps opened, offers, contracts, closed).
+//      Contracts is weekly (Luke, Oct 8); the month total is on Overview.
 //   2. Under each card, a ranked per-rep leaderboard for that same number.
 //   Replaced the per-rep Weekly + Monthly cards, which spilled off the TV
 //   at 9 reps. Every per-rep number is still on the Advanced tab.
@@ -34,11 +35,12 @@ export default function OpportunitiesView() {
           target={TEAM_TARGETS.offersPerWeek}
           sublabel={`${KPI_TARGETS.offersPerWeek}/wk per rep × ${REPS.length} reps`}
         />
+        {/* Weekly (Luke, Oct 8): the month total lives on Overview. */}
         <KpiCard
-          pace="month" label="Contracts Accepted (month)"
-          actual={head.contractsMonth}
-          target={TEAM_TARGETS.contractsPerMonth}
-          sublabel={`${KPI_TARGETS.contractsPerMonth}/mo per rep · ${totalAbandoned} aban this mo`}
+          pace="week" label="Contracts (week)"
+          actual={REPS.flatMap((r) => r.markets.map((m) => getPair(r.id, m)?.contractsWeek ?? 0)).reduce((a, b) => a + b, 0)}
+          target={KPI_TARGETS.contractsPerWeek * REPS.length}
+          sublabel={`${KPI_TARGETS.contractsPerWeek}/wk per rep · ${totalAbandoned} aban this mo`}
         />
         <KpiCard
           pace="month" label="Deals Closed (month)"
@@ -55,20 +57,20 @@ export default function OpportunitiesView() {
           Replaces nine per-rep cards that spilled off the TV at 9 reps. */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 flex-1 min-h-0">
         <Leaderboard
-          title="Opps Opened" period="this week" valueKey="oppsOpenedWeek" target={KPI_TARGETS.oppsOpenedPerWeek}
+          title="Opps Opened" valueKey="oppsOpenedWeek" target={KPI_TARGETS.oppsOpenedPerWeek}
           month={{ key: 'oppsOpenedMonth', target: KPI_TARGETS.oppsOpenedPerWeek * 4 }}
         />
         <Leaderboard
-          title="Offers Submitted" period="this week" valueKey="offersWeek" target={KPI_TARGETS.offersPerWeek}
+          title="Offers Submitted" valueKey="offersWeek" target={KPI_TARGETS.offersPerWeek}
           month={{ key: 'offersMonth', target: KPI_TARGETS.offersPerWeek * 4 }}
         />
         <Leaderboard
-          title="Contracts Accepted" period="this week" valueKey="contractsWeek" target={KPI_TARGETS.contractsPerWeek}
+          title="Contracts Accepted" valueKey="contractsWeek" target={KPI_TARGETS.contractsPerWeek}
           month={{ key: 'contractsMonth', target: KPI_TARGETS.contractsPerMonth }}
         />
-        {/* Deals Closed has only a monthly target, so it stays month-only
-            (Luke, Oct 7). */}
-        <Leaderboard title="Deals Closed" period="this month" valueKey="dealsClosedMonth" target={KPI_TARGETS.dealsClosedPerMonth} />
+        {/* Deals Closed has only a monthly target, so its board is month-only
+            (Luke, Oct 7; confirmed again Oct 8). */}
+        <Leaderboard title="Deals Closed" valueKey="dealsClosedMonth" target={KPI_TARGETS.dealsClosedPerMonth} />
       </div>
     </div>
   );
@@ -82,7 +84,7 @@ export default function OpportunitiesView() {
 // share of their own target on one shared scale, so the single dashed line
 // is the week target for the thick bar and the month target (weekly × 4)
 // for the thin one. Ranking is by the week, ties broken by the month.
-function Leaderboard({ title, period, valueKey, target, month }) {
+function Leaderboard({ title, valueKey, target, month }) {
   const rows = REPS.map((rep) => {
     const pairs = getPairsForRep(rep.id);
     const sum = (k) => pairs.reduce((a, p) => a + (p[k] || 0), 0);
@@ -95,7 +97,7 @@ function Leaderboard({ title, period, valueKey, target, month }) {
   const at = (v, t) => `${Math.min(100, (v / t / span) * 100)}%`;
   const hit = rows.filter((r) => r.value >= target).length;
   return (
-    <Panel className="min-h-0 flex flex-col" title={title} subtitle={`${hit}/${rows.length} at target`} accent={`By Rep · ${period}`}>
+    <Panel className="min-h-0 flex flex-col" title={title} subtitle={`${hit}/${rows.length} at target`} accent="By Rep">
       <div className="h-full flex flex-col justify-around min-h-0 gap-[2px]">
         {rows.map(({ rep, value, monthValue }) => (month ? (
           // Week + month: two lines per rep, each number beside its own bar

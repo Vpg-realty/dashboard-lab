@@ -55,7 +55,8 @@ git merge live-main
 
 Keep the lab side of any conflict in the lab-only edits: `VITE_DATA_BASE`
 in `liveStore.js`, `IS_LAB` / `STORAGE_PREFIX` / `REPO_NAME` in
-`config.js` and the files that use them, the `IS_LAB` checks in
+`config.js` and the files that use them (check `CelebrationBanner.jsx`'s
+`STORE` key after taking live's version: it must stay `STORAGE_PREFIX`), the `IS_LAB` checks in
 `Header.jsx`, this CLAUDE.md, `README.md`, the lab `deploy.yml`, and no
 `pinger.yml` / `scorecard.yml`. Then `npm run lint && npm run build` before
 pushing. Data is always live regardless; syncing only matters before

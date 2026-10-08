@@ -7,7 +7,6 @@ import SubAccountsPanel from './components/SubAccountsPanel.jsx';
 import ConversationsView from './views/ConversationsView.jsx';
 import AgentsView from './views/AgentsView.jsx';
 import OpportunitiesView from './views/OpportunitiesView.jsx';
-import RevenueView from './views/RevenueView.jsx';
 import MasterView from './views/MasterView.jsx';
 import AdvancedView from './views/AdvancedView.jsx';
 import PipelineView from './views/PipelineView.jsx';
@@ -19,9 +18,8 @@ const VIEWS = {
   conversations: { label: 'Conversations · live',           component: ConversationsView },
   agents:        { label: 'Agents · pipeline growth',       component: AgentsView },
   opportunities: { label: 'Opportunities · KPI tracking',   component: OpportunitiesView },
+  master:        { label: 'Overview · this month',          component: MasterView },
   leaderboard:   { label: 'Leaderboard · weekly score',     component: LeaderboardView },
-  revenue:       { label: 'Revenue · this month',           component: RevenueView },
-  master:        { label: 'Master · all metrics',           component: MasterView },
   pipeline:      { label: 'Pipeline · active deals',        component: PipelineView },
   advanced:      { label: 'Advanced · per-subaccount drill-down', component: AdvancedView },
 };
@@ -31,7 +29,7 @@ export default function App() {
   useDataUpdates();
   const dataStatus = useDataStatus();
 
-  const [view, setView] = useState('conversations');
+  const [view, setView] = useState(CYCLE_VIEWS[0]);
   const [isCycling, setIsCycling] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showModal, setShowModal] = useState(false);

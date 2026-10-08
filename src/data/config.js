@@ -78,12 +78,13 @@ export const PIPELINE_STAGES = [
 ];
 
 // View cycle order + per-view duration (ms).
-// Pipeline added Sept 29 (Luke). Revenue taken out of the rotation Oct 7
-// (Luke: simplify what the TV cycles through; Master already carries the
-// revenue goal bar) — it's still a tab, just before Advanced (NAV_VIEWS).
-export const CYCLE_VIEWS = ['conversations', 'agents', 'opportunities', 'leaderboard', 'master', 'pipeline'];
+// Pipeline added Sept 29 (Luke). Revenue tab removed Oct 8 (Luke: not
+// needed; Master carries the revenue goal bar).
+// Overview (view key 'master') is the first tab and first in the rotation
+// (Luke, Oct 8). Lab: Leaderboard after Opportunities.
+export const CYCLE_VIEWS = ['master', 'conversations', 'agents', 'opportunities', 'leaderboard', 'pipeline'];
 // Tab order in the nav bar: the rotation first, then the click-only tabs.
-export const NAV_VIEWS = [...CYCLE_VIEWS, 'revenue', 'advanced'];
+export const NAV_VIEWS = [...CYCLE_VIEWS, 'advanced'];
 export const CYCLE_INTERVAL_MS = 10000;
 
 // Date-range presets for the Advanced view.
